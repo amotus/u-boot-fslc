@@ -1,0 +1,8 @@
+FPTECHNO_VIGIL BOARD
+M:	Marc Ferland <ferlandm@amotus.ca>
+S:	Maintained
+F:	board/fptechno/vigil/
+F:	include/configs/vigil.h
+F:	include/configs/vigil_common.h
+F:	configs/vigil_nand_defconfig
+F:	configs/vigil_sd_defconfig

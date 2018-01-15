@@ -183,6 +183,15 @@ config TARGET_EMBESTMX6BOARDS
 	bool "embestmx6boards"
 	select BOARD_LATE_INIT
 
+config TARGET_FPTECHNO_VIGIL
+	bool "Support FPTechno Vigil"
+	select BOARD_LATE_INIT
+	select MX6UL
+	select DM
+	select DM_THERMAL
+	select SUPPORT_SPL
+	select BOARD_EARLY_INIT_F
+
 config TARGET_GE_BX50V3
 	bool "General Electric Bx50v3"
 	select BOARD_LATE_INIT
@@ -535,6 +544,7 @@ source "board/congatec/cgtqmx6eval/Kconfig"
 source "board/dhelectronics/dh_imx6/Kconfig"
 source "board/el/el6x/Kconfig"
 source "board/embest/mx6boards/Kconfig"
+source "board/fptechno/vigil/Kconfig"
 source "board/engicam/imx6q/Kconfig"
 source "board/engicam/imx6ul/Kconfig"
 source "board/freescale/mx6qarm2/Kconfig"

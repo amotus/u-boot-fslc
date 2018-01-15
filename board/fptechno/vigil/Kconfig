@@ -1,0 +1,15 @@
+if TARGET_FPTECHNO_VIGIL
+
+config SYS_BOARD
+	default "vigil"
+
+config SYS_VENDOR
+	default "fptechno"
+
+config SYS_SOC
+	default "mx6"
+
+config SYS_CONFIG_NAME
+	default "vigil"
+
+endif
