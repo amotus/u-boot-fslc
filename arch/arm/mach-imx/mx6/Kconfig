@@ -186,7 +186,7 @@ config TARGET_EMBESTMX6BOARDS
 config TARGET_FPTECHNO_VIGIL
 	bool "Support FPTechno Vigil"
 	select BOARD_LATE_INIT
-	select MX6UL
+	select MX6ULL
 	select DM
 	select DM_THERMAL
 	select SUPPORT_SPL
