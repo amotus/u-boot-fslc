@@ -187,19 +187,13 @@
 #endif
 
 #ifdef CONFIG_CMD_NET
+#define CONFIG_MXC_OCOTP
 #define CONFIG_FEC_MXC
 #define CONFIG_MII
-#define CONFIG_FEC_ENET_DEV		1
-
-#if (CONFIG_FEC_ENET_DEV == 0)
+#define CONFIG_FEC_ENET_DEV		0
 #define IMX_FEC_BASE			ENET_BASE_ADDR
-#define CONFIG_FEC_MXC_PHYADDR          0x2
+#define CONFIG_FEC_MXC_PHYADDR          0x1
 #define CONFIG_FEC_XCV_TYPE             RMII
-#elif (CONFIG_FEC_ENET_DEV == 1)
-#define IMX_FEC_BASE			ENET2_BASE_ADDR
-#define CONFIG_FEC_MXC_PHYADDR		0x1
-#define CONFIG_FEC_XCV_TYPE		RMII
-#endif
 #define CONFIG_ETHPRIME			"FEC"
 #endif
 
