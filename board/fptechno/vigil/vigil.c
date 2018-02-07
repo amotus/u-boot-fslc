@@ -770,11 +770,10 @@ void board_init_f(ulong dummy)
 	setup_i2c(1, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info2);
 	i2c_set_bus_num(1);
 
-
 	/* DDR initialization */
 	board_dram_init();
 
-	/* Clear the BSS. */
+	/* Clear the BSS */
 	memset(__bss_start, 0, __bss_end - __bss_start);
 
 	if (eeprom_revision == 2) {
