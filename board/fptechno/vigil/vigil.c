@@ -42,7 +42,6 @@
 
 #include "eeprom.h"
 
-int var_eeprom_v2_read_struct(struct var_eeprom_config_struct_v2_type *var_eeprom_config_struct_v2);
 int eeprom_revision __attribute__ ((section ("sram")));
 static long sdram_size __attribute__ ((section ("sram")));
 
@@ -484,7 +483,7 @@ static const struct boot_mode board_boot_modes[] = {
 
 #endif	/* CONFIG_CMD_BMODE */
 
-static struct var_eeprom_config_struct_v2_type var_eeprom_config_struct_v2;
+static struct eeprom_config var_eeprom_config_struct_v2;
 
 #define FDT_FILENAME_MAX_LEN	100
 
@@ -687,27 +686,15 @@ static void ccgr_init(void)
 	writel(0x01130100, (long *)CCM_CCOSR);
 }
 
-void p_udelay(int time)
-{
-	int i, j;
-
-	for (i = 0; i < time; i++) {
-		for (j = 0; j < 200; j++) {
-			asm("nop");
-			asm("nop");
-		}
-	}
-}
-
 int var_get_boot_device(void)
 {
 
 	switch (spl_boot_device()) {
-		case BOOT_DEVICE_MMC1:
-			if (1== mmc_get_env_devno())
-				return BOOT_DEVICE_MMC2;
-			else
-				return BOOT_DEVICE_MMC1;
+	case BOOT_DEVICE_MMC1:
+		if (1== mmc_get_env_devno())
+			return BOOT_DEVICE_MMC2;
+		else
+			return BOOT_DEVICE_MMC1;
 	case BOOT_DEVICE_NAND:
 		return 	BOOT_DEVICE_NAND;
 	default:
@@ -726,30 +713,28 @@ static void spl_dram_init(void)
  * Second phase ddr init. Use eeprom values.
  */
 
-static struct var_eeprom_config_struct_v2_type var_eeprom_config_struct_v2;
-
 static int spl_dram_init_v2(void)
 {
-	struct var_eeprom_config_struct_v2_type var_eeprom_config_struct_v2;
+	struct eeprom_config cfg;
 	int ret;
 
 	/* Add here: Read EEPROM and parse Variscite struct */
-	memset(&var_eeprom_config_struct_v2, 0x00, sizeof(var_eeprom_config_struct_v2));
+	memset(&cfg, 0x00, sizeof(cfg));
 
-	ret = var_eeprom_v2_read_struct(&var_eeprom_config_struct_v2);
+	ret = var_eeprom_v2_read_struct(&cfg);
 
 	if (ret)
-		return SPL_DRAM_INIT_STATUS_ERROR_NO_EEPROM;
+		return -1;
 
 	/* Test for VAR2 in the header. */
-	if (var_eeprom_config_struct_v2.variscite_magic!=0x32524156)
-		return SPL_DRAM_INIT_STATUS_ERROR_NO_EEPROM_STRUCT_DETECTED;
+	if (cfg.variscite_magic != 0x32524156)
+		return -1;
 
-	handle_eeprom_data(&var_eeprom_config_struct_v2);
+	handle_eeprom_data(&cfg);
 
-	sdram_size = var_eeprom_config_struct_v2.ddr_size*128;
+	sdram_size = cfg.ddr_size * 128;
 
-	return SPL_DRAM_INIT_STATUS_OK;
+	return 0;
 }
 
 void board_dram_init(void)
@@ -758,7 +743,7 @@ void board_dram_init(void)
 
 	/* Initialize DDR based on eeprom if exist */
 	spl_status = spl_dram_init_v2();
-	if (spl_status != SPL_DRAM_INIT_STATUS_OK) {
+	if (spl_status < 0) {
 		spl_dram_init();
 		eeprom_revision=0;
 	} else
