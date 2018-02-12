@@ -114,7 +114,7 @@
 		"fi;\0" \
 		"findfdt="\
 			"if test $fdt_file = undefined; then " \
-				"setenv fdt_file imx6ull-vigil.dtb;" \
+				"setenv fdt_file imx6ull-vigil-emmc-sd.dtb ;" \
 			"fi;\0" \
 
 #define CONFIG_BOOTCOMMAND \

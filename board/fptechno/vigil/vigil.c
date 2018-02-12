@@ -526,9 +526,7 @@ int board_late_init(void)
 		case 0x00:
 		case 0x02:
 			snprintf(fdt_filename, FDT_FILENAME_MAX_LEN, "%s",
-				 imxtype == MXC_CPU_MX6ULL ?
-				 "imx6ull-var-dart-sd_emmc.dtb" :
-				 "imx6ul-var-dart-sd_emmc.dtb");
+				 "imx6ull-vigil-emmc-sd.dtb");
 			break;
 		case 0x01:
 			snprintf(fdt_filename, FDT_FILENAME_MAX_LEN, "%s",
@@ -542,9 +540,7 @@ int board_late_init(void)
 		env_set("boot_dev", "mmc");
 		if (var_eeprom_config_struct_v2.som_info & 0x4)
 			snprintf(fdt_filename, FDT_FILENAME_MAX_LEN, "%s",
-				 imxtype == MXC_CPU_MX6ULL ?
-				 "imx6ull-var-dart-emmc_wifi.dtb" :
-				 "imx6ul-var-dart-emmc_wifi.dtb");
+				 "imx6ull-vigil-emmc-wifi.dtb");
 		else
 			snprintf(fdt_filename, FDT_FILENAME_MAX_LEN, "%s",
 				 imxtype == MXC_CPU_MX6ULL ?
