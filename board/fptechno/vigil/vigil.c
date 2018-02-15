@@ -229,7 +229,7 @@ static u32 get_boot_device(void)
 		/* MMC/eMMC: 8.5.3 */
 	case 0x6:
 	case 0x7:
-		if (1== mmc_get_env_devno())
+		if (1 == mmc_get_env_devno())
 			return VBOOT_DEVICE_MMC;
 		else
 			return VBOOT_DEVICE_SD;
