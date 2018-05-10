@@ -158,6 +158,7 @@ static iomux_v3_cfg_t const uart1_pads[] = {
 	MX6_PAD_UART1_RX_DATA__UART1_DCE_RX | MUX_PAD_CTRL(UART_PAD_CTRL),
 };
 
+/* uSD slot */
 static iomux_v3_cfg_t const usdhc1_pads[] = {
 	MX6_PAD_SD1_CLK__USDHC1_CLK | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 	MX6_PAD_SD1_CMD__USDHC1_CMD | MUX_PAD_CTRL(USDHC_PAD_CTRL),
@@ -167,6 +168,7 @@ static iomux_v3_cfg_t const usdhc1_pads[] = {
 	MX6_PAD_SD1_DATA3__USDHC1_DATA3 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 };
 
+/* eMMC soldered */
 static iomux_v3_cfg_t const usdhc2_pads[] = {
 	MX6_PAD_NAND_RE_B__USDHC2_CLK | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 	MX6_PAD_NAND_WE_B__USDHC2_CMD | MUX_PAD_CTRL(USDHC_PAD_CTRL),
@@ -489,7 +491,6 @@ static struct eeprom_config var_eeprom_config_struct_v2;
 
 int board_late_init(void)
 {
-	char *s;
 	char fdt_filename[FDT_FILENAME_MAX_LEN];
 	u32 imxtype,cpurev;
 
@@ -512,10 +513,6 @@ int board_late_init(void)
 		env_set("fdt_addr", "0x84000000");
 		env_set("loadaddr", "0x84600000");
 	}
-
-	s = env_get("var_auto_fdt_file");
-	if (s[0] != 'Y')
-		return 0;
 
 	var_eeprom_v2_read_struct(&var_eeprom_config_struct_v2);
 

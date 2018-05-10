@@ -50,7 +50,20 @@
 
 #define CONFIG_SYS_MMC_IMG_LOAD_PART	1
 
+#define CONFIG_MFG_ENV_SETTINGS \
+	"mfgtool_args=setenv bootargs console=${console},${baudrate} " \
+		"rdinit=/linuxrc " \
+		"g_mass_storage.stall=0 g_mass_storage.removable=1 " \
+		"g_mass_storage.idVendor=0x066F g_mass_storage.idProduct=0x37FF "\
+		"g_mass_storage.iSerialNumber=\"\" "\
+		"clk_ignore_unused "\
+		"\0" \
+	"initrd_addr=0x83800000\0" \
+	"initrd_high=0xffffffff\0" \
+	"bootcmd_mfg=run mfgtool_args;bootz ${loadaddr} ${initrd_addr} ${fdt_addr};\0" \
+
 #define CONFIG_EXTRA_ENV_SETTINGS \
+	CONFIG_MFG_ENV_SETTINGS \
 	"script=boot.scr\0" \
 	"image=zImage\0" \
 	"console=ttymxc0\0" \
@@ -126,10 +139,10 @@
 		   "else " \
 			   "if run loadimage; then " \
 				   "run mmcboot; " \
-			   "else run netboot; " \
+			   "else run bootcmd_mfg; " \
 			   "fi; " \
 		   "fi; " \
-	   "else run netboot; fi"
+	   "else run bootcmd_mfg; fi"
 
 /* Miscellaneous configurable options */
 #define CONFIG_SYS_MEMTEST_START	0x80000000
@@ -156,9 +169,9 @@
 /* environment organization */
 #define CONFIG_ENV_SIZE			SZ_8K
 #define CONFIG_ENV_OFFSET		(8 * SZ_64K)
-#define CONFIG_SYS_MMC_ENV_DEV		0   /* USDHC1 */
+#define CONFIG_SYS_MMC_ENV_DEV		1   /* USDHC2 - eMMC */
 #define CONFIG_SYS_MMC_ENV_PART		0   /* user area */
-#define CONFIG_MMCROOT			"/dev/mmcblk0p2"  /* USDHC1 */
+#define CONFIG_MMCROOT			"/dev/mmcblk1p2"  /* USDHC2 - eMMC */
 
 #ifndef CONFIG_SYS_DCACHE_OFF
 #endif
