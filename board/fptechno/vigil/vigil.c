@@ -159,6 +159,7 @@ static iomux_v3_cfg_t const uart1_pads[] = {
 };
 
 /* uSD slot */
+#ifndef CONFIG_SPL_BUILD
 static iomux_v3_cfg_t const usdhc1_pads[] = {
 	MX6_PAD_SD1_CLK__USDHC1_CLK | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 	MX6_PAD_SD1_CMD__USDHC1_CMD | MUX_PAD_CTRL(USDHC_PAD_CTRL),
@@ -167,6 +168,7 @@ static iomux_v3_cfg_t const usdhc1_pads[] = {
 	MX6_PAD_SD1_DATA2__USDHC1_DATA2 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 	MX6_PAD_SD1_DATA3__USDHC1_DATA3 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 };
+#endif
 
 /* eMMC soldered */
 static iomux_v3_cfg_t const usdhc2_pads[] = {
@@ -188,14 +190,8 @@ static void setup_iomux_uart(void)
 }
 
 static struct fsl_esdhc_cfg usdhc_cfg[2] = {
-	{USDHC1_BASE_ADDR, 0, 4},
-	{USDHC2_BASE_ADDR, 0, 8},
-};
-
-/* SPL boot from first device. Swap the device in case of SPL & eMMC */
-static struct fsl_esdhc_cfg usdhc_cfg_emmc[2] = {
-	{USDHC2_BASE_ADDR, 0, 8},
-	{USDHC1_BASE_ADDR, 0, 4},
+	{ .esdhc_base = USDHC1_BASE_ADDR, .sdhc_clk = 0, .max_bus_width = 4 },
+	{ .esdhc_base = USDHC2_BASE_ADDR, .sdhc_clk = 0, .max_bus_width = 8 },
 };
 
 int mmc_get_env_devno(void)
@@ -254,17 +250,14 @@ int board_mmc_getcd(struct mmc *mmc)
 
 int board_mmc_init(bd_t *bis)
 {
-	int i;
-	int err;
-#ifdef CONFIG_SPL_BUILD
-	int devno;
-#endif
+#ifndef CONFIG_SPL_BUILD
+	int ret, i;
 
 	/*
 	 * According to the board_mmc_init() the following map is done:
-	 * (U-boot device node)    (Physical Port)
-	 * mmc0                    USDHC1
-	 * mmc1                    USDHC2
+	 * (U-boot device node)    (Physical Port)   (Physical Device)
+	 * MMC0                    USDHC1            uSD
+	 * MMC1                    USDHC2            eMMC
 	 */
 	for (i = 0; i < CONFIG_SYS_FSL_USDHC_NUM; i++) {
 		switch (i) {
@@ -272,36 +265,34 @@ int board_mmc_init(bd_t *bis)
 			imx_iomux_v3_setup_multiple_pads(
 				usdhc1_pads, ARRAY_SIZE(usdhc1_pads));
 			usdhc_cfg[0].sdhc_clk = mxc_get_clock(MXC_ESDHC_CLK);
-			usdhc_cfg_emmc[0].sdhc_clk = mxc_get_clock(MXC_ESDHC_CLK);
 			break;
 		case 1:
 			imx_iomux_v3_setup_multiple_pads(
 				usdhc2_pads, ARRAY_SIZE(usdhc2_pads));
 			usdhc_cfg[1].sdhc_clk = mxc_get_clock(MXC_ESDHC2_CLK);
-			usdhc_cfg_emmc[1].sdhc_clk = mxc_get_clock(MXC_ESDHC2_CLK);
 			break;
 		default:
-			printf("Warning: you configured more USDHC controllers (%d) than supported by the board\n", i + 1);
-			return 0;
+			printf("Warning: you configured more USDHC controllers"
+			       "(%d) than supported by the board (%d)\n",
+			       i + 1, CONFIG_SYS_FSL_USDHC_NUM);
+			return -EINVAL;
 		}
 
-#ifdef CONFIG_SPL_BUILD
-		/* Swap the mmc device table in SPL/eMMC boot. SPL
-		 * code limitation handle first device only.*/
-		devno = mmc_get_env_devno();
-		if (devno == 0)
-			err = fsl_esdhc_initialize(bis, &usdhc_cfg[i]);
-		else
-			err = fsl_esdhc_initialize(bis, &usdhc_cfg_emmc[i]);
-		if (err)
-			printf("Warning: failed to initialize mmc dev %d\n", i);
-#else
-		err = fsl_esdhc_initialize(bis, &usdhc_cfg[i]);
-		if (err)
-			printf("Warning: failed to initialize mmc dev %d\n", i);
-#endif
+		ret = fsl_esdhc_initialize(bis, &usdhc_cfg[i]);
+		if (ret)
+			return ret;
 	}
+
 	return 0;
+#else
+	/* in spl, always boot from MMC1 (eMMC on USDHC2) */
+	imx_iomux_v3_setup_multiple_pads(usdhc2_pads, ARRAY_SIZE(usdhc2_pads));
+	usdhc_cfg[0].esdhc_base = USDHC2_BASE_ADDR;
+	usdhc_cfg[0].sdhc_clk = mxc_get_clock(MXC_ESDHC2_CLK);
+	usdhc_cfg[0].max_bus_width = 8;
+	gd->arch.sdhc_clk = usdhc_cfg[0].sdhc_clk;
+	return fsl_esdhc_initialize(bis, &usdhc_cfg[0]);
+#endif
 }
 
 int check_mmc_autodetect(void)
@@ -679,23 +670,6 @@ static void ccgr_init(void)
 	writel(0x01130100, (long *)CCM_CCOSR);
 }
 
-int var_get_boot_device(void)
-{
-
-	switch (spl_boot_device()) {
-	case BOOT_DEVICE_MMC1:
-		if (1== mmc_get_env_devno())
-			return BOOT_DEVICE_MMC2;
-		else
-			return BOOT_DEVICE_MMC1;
-	case BOOT_DEVICE_NAND:
-		return 	BOOT_DEVICE_NAND;
-	default:
-		return BOOT_DEVICE_NONE;
-	}
-
-}
-
 static void spl_dram_init(void)
 {
 	mx6ul_dram_iocfg(mem_ddr.width, &mx6_ddr_ioregs, &mx6_grp_ioregs);
@@ -818,21 +792,6 @@ void board_init_f(ulong dummy)
 
 	dram_init();
 	printf("Ram size: %ld\n", sdram_size);
-	printf("Boot Device: ");
-	switch (var_get_boot_device()) {
-	case BOOT_DEVICE_MMC1:
-		printf("SD\n");
-		break;
-	case BOOT_DEVICE_MMC2:
-		printf("MMC\n");
-		break;
-	case BOOT_DEVICE_NAND:
-		printf("NAND\n");
-		break;
-	default:
-		printf("UNKNOWN\n");
-		break;
-	}
 
 	/* load/boot image from boot device */
 	board_init_r(NULL, 0);
