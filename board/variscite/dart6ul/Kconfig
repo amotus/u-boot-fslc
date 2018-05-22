@@ -1,15 +1,15 @@
-if TARGET_FPTECHNO_VIGIL
+if TARGET_VARISCITE_DART6UL
 
 config SYS_BOARD
-	default "vigil"
+	default "dart6ul"
 
 config SYS_VENDOR
-	default "fptechno"
+	default "variscite"
 
 config SYS_SOC
 	default "mx6"
 
 config SYS_CONFIG_NAME
-	default "vigil"
+	default "dart6ul"
 
 endif

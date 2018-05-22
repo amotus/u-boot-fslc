@@ -3,12 +3,12 @@
  *
  * Copyright (C) 2018 Amotus Solutions, Inc.
  *
- * Configuration settings for the Freescale i.MX6UL Vigil board.
+ * Configuration settings for the Variscite DART-6UL board.
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
-#ifndef __VIGIL_H
-#define __VIGIL_H
+#ifndef __DART6UL_H
+#define __DART6UL_H
 
 #include <asm/arch/imx-regs.h>
 #include <linux/sizes.h>
@@ -64,7 +64,7 @@
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	CONFIG_MFG_ENV_SETTINGS \
-	"script=boot.scr\0" \
+	"bootenv=uEnv.txt\0" \
 	"image=zImage\0" \
 	"console=ttymxc0\0" \
 	"fdt_high=0xffffffff\0" \
@@ -73,17 +73,13 @@
 	"fdt_addr=0x83000000\0" \
 	"boot_fdt=try\0" \
 	"ip_dyn=yes\0" \
-	"videomode=video=ctfb:x:480,y:272,depth:24,pclk:108695,le:8,ri:4,up:2,lo:4,hs:41,vs:10,sync:0,vmode:0\0" \
 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
 	"mmcroot=" CONFIG_MMCROOT " rootwait rw\0" \
 	"mmcautodetect=yes\0" \
 	"mmcargs=setenv bootargs console=${console},${baudrate} " \
 		"root=${mmcroot}\0" \
-	"loadbootscript=" \
-		"fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${script};\0" \
-	"bootscript=echo Running bootscript from mmc ...; " \
-		"source\0" \
+	"loadbootenv=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${bootenv};\0" \
 	"loadimage=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}\0" \
 	"loadfdt=fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}\0" \
 	"mmcboot=echo Booting from mmc ...; " \
@@ -125,24 +121,24 @@
 		"else " \
 			"bootz; " \
 		"fi;\0" \
-		"findfdt="\
-			"if test $fdt_file = undefined; then " \
-				"setenv fdt_file imx6ull-vigil-emmc-sd.dtb ;" \
-			"fi;\0" \
+	"fdt_file=imx6ull-dart6ul-vigil.dtb\0" \
 
 #define CONFIG_BOOTCOMMAND \
-	   "run findfdt;" \
-	   "mmc dev ${mmcdev};" \
-	   "mmc dev ${mmcdev}; if mmc rescan; then " \
-		   "if run loadbootscript; then " \
-			   "run bootscript; " \
-		   "else " \
-			   "if run loadimage; then " \
-				   "run mmcboot; " \
-			   "else run bootcmd_mfg; " \
-			   "fi; " \
-		   "fi; " \
-	   "else run bootcmd_mfg; fi"
+	"mmc dev ${mmcdev}; " \
+	"mmc dev ${mmcdev}; " \
+	"if mmc rescan; then " \
+		"if run loadbootenv; then " \
+			"echo Loaded environment from ${bootenv}; " \
+			"env import -t ${loadaddr} ${filesize}; " \
+			"if run loadimage; then " \
+				"run mmcboot; " \
+			"fi; " \
+		"else " \
+			"echo Error loading environment from ${bootenv}; " \
+		"fi; " \
+	"else " \
+		"run bootcmd_mfg; " \
+	"fi;"
 
 /* Miscellaneous configurable options */
 #define CONFIG_SYS_MEMTEST_START	0x80000000
@@ -205,18 +201,5 @@
 #endif
 
 #define CONFIG_IMX_THERMAL
-
-#ifndef CONFIG_SPL_BUILD
-#ifdef CONFIG_VIDEO
-#define CONFIG_VIDEO_MXS
-#define CONFIG_VIDEO_LOGO
-#define CONFIG_SPLASH_SCREEN
-#define CONFIG_SPLASH_SCREEN_ALIGN
-#define CONFIG_BMP_16BPP
-#define CONFIG_VIDEO_BMP_RLE8
-#define CONFIG_VIDEO_BMP_LOGO
-#define MXS_LCDIF_BASE MX6UL_LCDIF1_BASE_ADDR
-#endif
-#endif
 
 #endif
