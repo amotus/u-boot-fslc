@@ -64,6 +64,7 @@
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	CONFIG_MFG_ENV_SETTINGS \
+	"bootlimit=3\0" \
 	"bootenv=uEnv.txt\0" \
 	"image=zImage\0" \
 	"console=ttymxc0\0" \
@@ -72,61 +73,29 @@
 	"fdt_file=undefined\0" \
 	"fdt_addr=0x83000000\0" \
 	"boot_fdt=try\0" \
-	"ip_dyn=yes\0" \
 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
-	"mmcroot=" CONFIG_MMCROOT " rootwait rw\0" \
+	"mmcroot=/dev/mmcblk1p\0" \
+	"partnum=2\0" \
 	"mmcautodetect=yes\0" \
 	"mmcargs=setenv bootargs console=${console},${baudrate} " \
-		"root=${mmcroot}\0" \
-	"loadbootenv=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${bootenv};\0" \
+		"root=${mmcroot}${partnum} rootwait rw\0" \
+	"loadbootenv=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${bootenv}\0" \
 	"loadimage=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}\0" \
 	"loadfdt=fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}\0" \
 	"mmcboot=echo Booting from mmc ...; " \
 		"run mmcargs; " \
-		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
-			"if run loadfdt; then " \
-				"bootz ${loadaddr} - ${fdt_addr}; " \
-			"else " \
-				"if test ${boot_fdt} = try; then " \
-					"bootz; " \
-				"else " \
-					"echo WARN: Cannot load the DT; " \
-				"fi; " \
-			"fi; " \
+		"if run loadfdt; then " \
+			"bootz ${loadaddr} - ${fdt_addr}; " \
 		"else " \
-			"bootz; " \
+			"echo WARN: Cannot load the DT; " \
 		"fi;\0" \
-	"netargs=setenv bootargs console=${console},${baudrate} " \
-		"root=/dev/nfs " \
-	"ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
-		"netboot=echo Booting from net ...; " \
-		"run netargs; " \
-		"if test ${ip_dyn} = yes; then " \
-			"setenv get_cmd dhcp; " \
-		"else " \
-			"setenv get_cmd tftp; " \
-		"fi; " \
-		"${get_cmd} ${image}; " \
-		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
-			"if ${get_cmd} ${fdt_addr} ${fdt_file}; then " \
-				"bootz ${loadaddr} - ${fdt_addr}; " \
-			"else " \
-				"if test ${boot_fdt} = try; then " \
-					"bootz; " \
-				"else " \
-					"echo WARN: Cannot load the DT; " \
-				"fi; " \
-			"fi; " \
-		"else " \
-			"bootz; " \
-		"fi;\0" \
+	"swaproot=if test ${partnum} = 2; setenv partnum 3; else setenv partnum 2;\0" \
+	"altbootcmd=run swaproot; saveenv; run bootcmd;\0" \
 	"fdt_file=imx6ull-dart6ul-vigil.dtb\0" \
 
 #define CONFIG_BOOTCOMMAND \
-	"mmc dev ${mmcdev}; " \
-	"mmc dev ${mmcdev}; " \
-	"if mmc rescan; then " \
+	"if mmc dev ${mmcdev}; then " \
 		"if run loadbootenv; then " \
 			"echo Loaded environment from ${bootenv}; " \
 			"env import -t ${loadaddr} ${filesize}; " \
@@ -167,18 +136,8 @@
 #define CONFIG_ENV_OFFSET		(8 * SZ_64K)
 #define CONFIG_SYS_MMC_ENV_DEV		1   /* USDHC2 - eMMC */
 #define CONFIG_SYS_MMC_ENV_PART		0   /* user area */
-#define CONFIG_MMCROOT			"/dev/mmcblk1p2"  /* USDHC2 - eMMC */
 
 #ifndef CONFIG_SYS_DCACHE_OFF
-#endif
-
-#ifdef CONFIG_FSL_QSPI
-#define CONFIG_SF_DEFAULT_BUS		0
-#define CONFIG_SF_DEFAULT_CS		0
-#define CONFIG_SF_DEFAULT_SPEED	40000000
-#define CONFIG_SF_DEFAULT_MODE		SPI_MODE_0
-#define FSL_QSPI_FLASH_NUM		1
-#define FSL_QSPI_FLASH_SIZE		SZ_32M
 #endif
 
 /* USB Configs */
@@ -201,5 +160,15 @@
 #endif
 
 #define CONFIG_IMX_THERMAL
+
+/* watchdog support */
+#define CONFIG_IMX_WATCHDOG
+
+/* bootcount support */
+#define CONFIG_BOOTCOUNT_LIMIT
+#define CONFIG_BOOTCOUNT_I2C
+#define CONFIG_SYS_I2C_RTC_ADDR 	0x68 /* TODO: mettre la vraie adresse */
+#define CONFIG_SYS_BOOTCOUNT_ADDR       0x20
+#define CONFIG_BOOTCOUNT_ALEN           1
 
 #endif
