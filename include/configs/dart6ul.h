@@ -162,7 +162,9 @@
 #define CONFIG_IMX_THERMAL
 
 /* watchdog support */
+#define CONFIG_HW_WATCHDOG
 #define CONFIG_IMX_WATCHDOG
+#define CONFIG_WATCHDOG_TIMEOUT_MSECS	60000
 
 /* bootcount support */
 #define CONFIG_BOOTCOUNT_LIMIT
