@@ -95,7 +95,9 @@
 	"fdt_file=imx6ull-dart6ul-vigil.dtb\0" \
 
 #define CONFIG_BOOTCOMMAND \
-	"if mmc dev ${mmcdev}; then " \
+	"if test ${mfgboot} = yes; then " \
+		"run bootcmd_mfg; " \
+	"elif mmc dev ${mmcdev}; then " \
 		"if run loadbootenv; then " \
 			"echo Loaded environment from ${bootenv}; " \
 			"env import -t ${loadaddr} ${filesize}; " \
@@ -106,7 +108,7 @@
 			"echo Error loading environment from ${bootenv}; " \
 		"fi; " \
 	"else " \
-		"run bootcmd_mfg; " \
+		"echo Error booting platform. Please contact support.; " \
 	"fi;"
 
 /* Miscellaneous configurable options */

@@ -415,6 +415,13 @@ int board_late_init(void)
 	}
 #endif
 
+#ifdef CONFIG_USB_GADGET_DOWNLOAD
+	/* the usb download gadget is only used for board production */
+	env_set("mfgboot", "yes");
+#else
+	env_set("mfgboot", "no");
+#endif
+
 	return 0;
 }
 
@@ -606,7 +613,7 @@ void board_init_f(ulong dummy)
 			break;
 		}
 
-		if (eeprom_cfg.som_info &0x04)
+		if (eeprom_cfg.som_info & 0x04)
 			printf("WIFI\n");
 		else
 			printf("\n");
