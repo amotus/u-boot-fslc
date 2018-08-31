@@ -171,7 +171,7 @@
 /* bootcount support */
 #define CONFIG_BOOTCOUNT_LIMIT
 #define CONFIG_BOOTCOUNT_I2C
-#define CONFIG_SYS_I2C_RTC_ADDR 	0x68 /* TODO: mettre la vraie adresse */
+#define CONFIG_SYS_I2C_RTC_ADDR 	0x6f
 #define CONFIG_SYS_BOOTCOUNT_ADDR       0x20
 #define CONFIG_BOOTCOUNT_ALEN           1
 

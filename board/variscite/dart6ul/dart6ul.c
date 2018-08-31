@@ -422,6 +422,9 @@ int board_late_init(void)
 	env_set("mfgboot", "no");
 #endif
 
+	/* Set i2c mux to allow communication with rtc */
+	i2c_set_bus_num(1);
+
 	return 0;
 }
 
