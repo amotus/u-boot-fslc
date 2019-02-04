@@ -90,7 +90,7 @@
 		"else " \
 			"echo WARN: Cannot load the DT; " \
 		"fi;\0" \
-	"swaproot=if test ${partnum} = 2; setenv partnum 3; else setenv partnum 2;\0" \
+	"swaproot=if test ${partnum} = 2; then setenv partnum 4; else setenv partnum 2; fi;\0" \
 	"altbootcmd=run swaproot; saveenv; run bootcmd;\0" \
 	"fdt_file=imx6ull-dart6ul-vigil.dtb\0" \
 
