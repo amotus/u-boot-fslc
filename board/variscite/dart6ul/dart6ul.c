@@ -437,8 +437,8 @@ int checkboard(void)
 
 #ifdef CONFIG_SPL_BUILD
 
-#include <libfdt.h>
 #include <spl.h>
+#include <linux/libfdt.h>
 #include <asm/arch/mx6-ddr.h>
 
 static struct mx6ul_iomux_grp_regs mx6_grp_ioregs = {

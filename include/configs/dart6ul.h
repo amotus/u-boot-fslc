@@ -23,7 +23,6 @@
 /* Size of malloc() pool */
 #define CONFIG_SYS_MALLOC_LEN		(16 * SZ_1M)
 
-#define CONFIG_MXC_UART
 #define CONFIG_MXC_UART_BASE		UART1_BASE
 
 /* MMC Configs */
@@ -118,10 +117,7 @@
 #define CONFIG_SYS_LOAD_ADDR		CONFIG_LOADADDR
 #define CONFIG_SYS_HZ			1000
 
-#define CONFIG_CMDLINE_EDITING
-
 /* Physical Memory Map */
-#define CONFIG_NR_DRAM_BANKS		1
 #define PHYS_SDRAM			MMDC0_ARB_BASE_ADDR
 
 #define CONFIG_SYS_SDRAM_BASE		PHYS_SDRAM
@@ -153,7 +149,6 @@
 #ifdef CONFIG_CMD_NET
 #define CONFIG_MXC_OCOTP
 #define CONFIG_FEC_MXC
-#define CONFIG_MII
 #define CONFIG_FEC_ENET_DEV		0
 #define IMX_FEC_BASE			ENET_BASE_ADDR
 #define CONFIG_FEC_MXC_PHYADDR          0x1
