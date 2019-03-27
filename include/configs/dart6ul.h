@@ -28,8 +28,6 @@
 /* MMC Configs */
 #ifdef CONFIG_FSL_USDHC
 #define CONFIG_SYS_FSL_ESDHC_ADDR	USDHC2_BASE_ADDR
-#define CONFIG_SUPPORT_EMMC_BOOT
-
 
 /* NAND pin conflicts with usdhc2 */
 #ifdef CONFIG_NAND_MXS
