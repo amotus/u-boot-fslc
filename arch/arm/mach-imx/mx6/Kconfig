@@ -183,8 +183,17 @@ config TARGET_EMBESTMX6BOARDS
 	bool "embestmx6boards"
 	select BOARD_LATE_INIT
 
-config TARGET_VARISCITE_DART6UL
-	bool "Support Variscite DART-6UL"
+config TARGET_VARISCITE_DART6UL_EVK
+	bool "Support Variscite DART-6UL EVK"
+	select BOARD_LATE_INIT
+	select MX6ULL
+	select DM
+	select DM_THERMAL
+	select SUPPORT_SPL
+	select BOARD_EARLY_INIT_F
+
+config TARGET_VARISCITE_DART6UL_IDE
+	bool "IDE carrier board based on DART-6UL"
 	select BOARD_LATE_INIT
 	select MX6ULL
 	select DM

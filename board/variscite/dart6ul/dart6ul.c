@@ -40,7 +40,7 @@
 #include <usb.h>
 #include <usb/ehci-ci.h>
 
-#include "eeprom.h"
+#include "../common/eeprom.h"
 
 int eeprom_revision __attribute__ ((section ("sram")));
 static long sdram_size __attribute__ ((section ("sram")));
@@ -348,6 +348,84 @@ int board_phy_config(struct phy_device *phydev)
 
 #endif	/* CONFIG_FEC_MXC */
 
+#ifdef CONFIG_TARGET_VARISCITE_DART6UL_IDE
+
+#define CARRIER_EEPROM_ADDR 0x52
+#define CARRIER_MAGIC 0xcb1de445
+#define HDR_NAME_LEN   64
+#define HDR_SERIAL_LEN 64
+#define HDR_CONFIG_LEN 64
+
+struct board_eecfg {
+	unsigned int magic;
+	unsigned int rev;
+	char name[HDR_NAME_LEN];
+	char serial[HDR_SERIAL_LEN];
+	char config[HDR_CONFIG_LEN];
+};
+
+enum board_rev {
+	IDE_REVA,
+	IDE_REVB,
+	IDE_UNKNOWN,
+};
+
+#define HDR_SIZE 200 		/* 4 + 4 + 64 + 64 + 64 */
+
+int get_board_eecfg(struct board_eecfg *h)
+{
+	uchar buf[HDR_SIZE];
+
+	if (i2c_probe(CARRIER_EEPROM_ADDR))
+		return -ENODEV;
+
+	if (i2c_read(CARRIER_EEPROM_ADDR, 0, 1, buf, sizeof(buf)))
+		return -EIO;
+
+	/* deserialize */
+	h->magic = buf[3] << 24 | buf[2] << 16 | buf[1] << 8 | buf[0];
+	h->rev = buf[7] << 24 | buf[6] << 16 | buf[5] << 8 | buf[4];
+	memcpy(h->name, &buf[8], HDR_NAME_LEN);
+	memcpy(h->serial, &buf[72], HDR_SERIAL_LEN);
+	memcpy(h->config, &buf[136], HDR_CONFIG_LEN);
+
+	if (h->magic != CARRIER_MAGIC)
+		return -EINVAL;
+
+	return 0;
+}
+
+enum board_rev get_board_rev(void)
+{
+	struct board_eecfg cfg;
+	int err;
+
+	err = get_board_eecfg(&cfg);
+	if (!err) {
+		switch (cfg.rev) {
+		case 0x0: return IDE_REVA;
+		case 0x1: return IDE_REVB;
+		default:
+			printf("Carrier: unknown revision 0x%x, assuming revA\n", cfg.rev);
+			return IDE_REVA;
+		}
+	}
+	switch (err) {
+	case -ENODEV:
+		puts("Carrier: no i2c device detected, assuming revA\n");
+		break;
+	case -EINVAL:
+		puts("Carrier: wrong magic, assuming revA\n");
+		break;
+	default:
+		puts("Carrier: io error reading eeprom, assuming revA\n");
+		break;
+	}
+	return IDE_REVA;
+}
+
+#endif
+
 int board_early_init_f(void)
 {
 	setup_iomux_uart();
@@ -420,6 +498,13 @@ int board_late_init(void)
 	env_set("mfgboot", "yes");
 #else
 	env_set("mfgboot", "no");
+#endif
+
+#ifdef CONFIG_TARGET_VARISCITE_DART6UL_IDE
+	if (get_board_rev() == IDE_REVA)
+		env_set("fdt_file", "imx6ull-dart6ul-ide-revA.dtb");
+	else
+		env_set("fdt_file", "imx6ull-dart6ul-ide-revB.dtb");
 #endif
 
 	/* Set i2c mux to allow communication with rtc */

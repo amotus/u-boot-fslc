@@ -4,4 +4,4 @@
 # SPDX-License-Identifier: GPL-2.0+
 #
 
-obj-y := dart6ul.o eeprom.o
+obj-y := dart6ul.o

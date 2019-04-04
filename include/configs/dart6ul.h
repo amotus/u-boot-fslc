@@ -91,7 +91,7 @@
 		"fi;\0" \
 	"swaproot=if test ${partnum} = 2; then setenv partnum 4; else setenv partnum 2; fi;\0" \
 	"altbootcmd=run swaproot; saveenv; run bootcmd;\0" \
-	"fdt_file=imx6ull-dart6ul-vigil.dtb\0" \
+	"fdt_file=imx6ull-dart6ul-6ulcustomboard.dtb\0" \
 
 #define CONFIG_BOOTCOMMAND \
 	"if test ${mfgboot} = yes; then " \
@@ -100,11 +100,9 @@
 		"if run loadbootenv; then " \
 			"echo Loaded environment from ${bootenv}; " \
 			"env import -t ${loadaddr} ${filesize}; " \
-			"if run loadimage; then " \
-				"run mmcboot; " \
-			"fi; " \
-		"else " \
-			"echo Error loading environment from ${bootenv}; " \
+		"fi; " \
+		"if run loadimage; then " \
+			"run mmcboot; " \
 		"fi; " \
 	"else " \
 		"echo Error booting platform. Please contact support.; " \
@@ -163,11 +161,8 @@
 #define CONFIG_IMX_WATCHDOG
 #define CONFIG_WATCHDOG_TIMEOUT_MSECS	60000
 
-/* bootcount support */
-#define CONFIG_BOOTCOUNT_LIMIT
-#define CONFIG_BOOTCOUNT_I2C
+/* bootcount support -- only on ide project */
 #define CONFIG_SYS_I2C_RTC_ADDR 	0x6f
-#define CONFIG_SYS_BOOTCOUNT_ADDR       0x20
 #define CONFIG_BOOTCOUNT_ALEN           1
 
 #endif
