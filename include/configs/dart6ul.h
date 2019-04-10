@@ -91,7 +91,7 @@
 		"fi;\0" \
 	"swaproot=if test ${partnum} = 2; then setenv partnum 4; else setenv partnum 2; fi;\0" \
 	"altbootcmd=run swaproot; saveenv; run bootcmd;\0" \
-	"fdt_file=imx6ull-dart6ul-6ulcustomboard.dtb\0" \
+	"fdt_file=imx6ull-dart6ul-6ulcustomboard.dtb\0"
 
 #define CONFIG_BOOTCOMMAND \
 	"if test ${mfgboot} = yes; then " \
