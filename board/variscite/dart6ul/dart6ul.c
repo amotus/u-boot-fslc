@@ -351,6 +351,7 @@ int board_phy_config(struct phy_device *phydev)
 #ifdef CONFIG_TARGET_VARISCITE_DART6UL_IDE
 
 #define CARRIER_EEPROM_ADDR 0x52
+#define CARRIER_EEPROM_BUS  0x1
 #define CARRIER_MAGIC 0xcb1de445
 #define HDR_NAME_LEN   64
 #define HDR_SERIAL_LEN 64
@@ -375,12 +376,17 @@ enum board_rev {
 int get_board_eecfg(struct board_eecfg *h)
 {
 	uchar buf[HDR_SIZE];
+	int prevbus = i2c_get_bus_num();
+
+	i2c_set_bus_num(CARRIER_EEPROM_BUS);
 
 	if (i2c_probe(CARRIER_EEPROM_ADDR))
 		return -ENODEV;
 
 	if (i2c_read(CARRIER_EEPROM_ADDR, 0, 1, buf, sizeof(buf)))
 		return -EIO;
+
+	i2c_set_bus_num(prevbus);
 
 	/* deserialize */
 	h->magic = buf[3] << 24 | buf[2] << 16 | buf[1] << 8 | buf[0];
