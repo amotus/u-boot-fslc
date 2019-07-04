@@ -421,8 +421,8 @@ enum board_rev get_board_rev(void)
 		puts("Carrier: no i2c device detected, assuming revA\n");
 		break;
 	case -EINVAL:
-		puts("Carrier: wrong magic, assuming revA\n");
-		break;
+		puts("Carrier: wrong magic, assuming revB\n");
+		return IDE_REVB;
 	default:
 		puts("Carrier: io error reading eeprom, assuming revA\n");
 		break;
