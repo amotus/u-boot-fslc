@@ -459,6 +459,13 @@ int board_init(void)
 	setup_usb();
 #endif
 
+#ifdef CONFIG_TARGET_VARISCITE_DART6UL_TELFLEX
+	/* prevent mcu reset early (no safety check) */
+	gpio_request(118, "mcu-boot0");
+	gpio_direction_output(118, 0);
+	gpio_request(117, "mcu-nrst");
+	gpio_direction_output(117, 1);
+#endif
 	return 0;
 }
 
@@ -511,6 +518,13 @@ int board_late_init(void)
 		env_set("fdt_file", "imx6ull-dart6ul-ide-revA.dtb");
 	else
 		env_set("fdt_file", "imx6ull-dart6ul-ide-revB.dtb");
+#endif
+
+#ifdef CONFIG_TARGET_VARISCITE_DART6UL_TELFLEX
+	gpio_request(10, "mode_gain");
+	gpio_direction_output(10, env_get_hex("mode_gain", 0));
+	gpio_request(135, "mode_microphone");
+	gpio_direction_output(135, env_get_hex("mode_microphone", 0));
 #endif
 
 	/* Set i2c mux to allow communication with rtc */
