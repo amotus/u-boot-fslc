@@ -63,7 +63,7 @@
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	CONFIG_MFG_ENV_SETTINGS \
-	"bootlimit=3\0" \
+	"bootlimit=0\0" \
 	"bootenv=uEnv.txt\0" \
 	"image=zImage\0" \
 	"console=ttymxc0\0" \
