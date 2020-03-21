@@ -170,6 +170,7 @@ static int mxs_is_batt_ready(void)
 	return (mxs_get_batt_volt() >= 3600);
 }
 
+#ifndef CONFIG_FLOATING_BATT_PIN
 /**
  * mxs_is_batt_good() - Test if battery is operational at all
  *
@@ -223,6 +224,7 @@ static int mxs_is_batt_good(void)
 	debug("SPL: Battery Voltage too low\n");
 	return 0;
 }
+#endif
 
 /**
  * mxs_power_setup_5v_detect() - Start the 5V input detection comparator
@@ -908,7 +910,16 @@ static void mxs_power_configure_power_source(void)
 	mxs_src_power_init();
 
 	if (readl(&power_regs->hw_power_sts) & POWER_STS_VDD5V_GT_VDDIO) {
-		batt_ready = mxs_is_batt_ready();
+#ifdef CONFIG_FLOATING_BATT_PIN
+		/*
+		 * If the BATT pin is floating and no real battery is
+		 * present false values could be read that will lead to
+		 * boot from non-existing battery, causing a brownout.
+		 * Since 5V is present, boot from it directly.
+		 */
+		mxs_5v_boot();
+#else
+        batt_ready = mxs_is_batt_ready();
 		if (batt_ready) {
 			/* 5V source detected, good battery detected. */
 			mxs_batt_boot();
@@ -923,6 +934,7 @@ static void mxs_power_configure_power_source(void)
 			}
 			mxs_5v_boot();
 		}
+#endif /* else CONFIG_FLOATING_BATT_PIN */
 	} else {
 		/* 5V not detected, booting from battery. */
 		mxs_batt_boot();
