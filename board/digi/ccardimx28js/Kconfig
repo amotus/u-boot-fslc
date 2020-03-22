@@ -1,0 +1,20 @@
+if TARGET_CCARDIMX28JS
+
+config SYS_BOARD
+	default "ccardimx28js"
+
+config SYS_VENDOR
+	default "digi"
+
+config SYS_SOC
+	default "mxs"
+
+config SYS_CONFIG_NAME
+	default "ccardimx28js"
+
+config FLOATING_BATT_PIN
+    bool "Enable floating batt pin"
+	help
+	  Enable floating batt pin
+
+endif

@@ -1,0 +1,6 @@
+CCARDIMX28JS BOARD
+M:	Walter Bonetti <bonettiw@amotus.ca>
+S:	Maintained
+F:	board/digi/ccardimx28js/
+F:	include/configs/ccardimx28js.h
+F:	configs/ccardimx28js_nand_defconfig

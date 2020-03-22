@@ -1,0 +1,24 @@
+DIGI ccardimx28js
+==================
+
+Supported hardware: ccardimx28js rev 128MiB without Wifi is supported in U-Boot.
+
+Files of the ccardimx28js port
+--------------------------
+
+arch/arm/cpu/arm926ejs/mxs/	- The CPU support code for the Freescale i.MX28
+arch/arm/include/asm/arch-mxs/	- Header files for the Freescale i.MX28
+board/digi/ccardimx28js/	- ccardimx28js board specific files
+include/configs/ccardimx28js.h	- ccardimx28js configuration file
+
+Environment Storage
+-------------------
+
+There are three targets for ccardimx28js:
+
+"make ccardimx28js_nand_config"       - store environment variables into NAND flash
+
+Choose the target accordingly.
+
+Note: The ccardimx28js board does come with a NVRAM flash populated from the
+vendor. The fec polarity will be different between WiFi version and non Wifi Version.
