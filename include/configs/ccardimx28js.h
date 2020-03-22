@@ -118,8 +118,8 @@
     "amotus_sys=a\0" \
     "amotus_seamless_counter=0\0" \
     "amotus_update_mode=yes\0" \
-	"update_nand_full_filename=u-boot.nand\0" \
-	"update_nand_firmware_filename=uboot-mxsboot-nand\0"	\
+	"update_nand_full_filename=u-boot-mxsboot.nand\0" \
+	"update_nand_firmware_filename=u-boot.sb\0"	\
 	"update_nand_firmware_maxsz=0x100000\0"	\
 	"update_nand_stride=0x40\0"	/* MX28 datasheet ch. 12.12 */ \
 	"update_nand_count=0x4\0"	/* MX28 datasheet ch. 12.12 */ \
