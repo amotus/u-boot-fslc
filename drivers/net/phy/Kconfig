@@ -151,6 +151,14 @@ config PHY_MICREL_KSZ8XXX
 	  (now a part of Microchip). This includes drivers for the KSZ804,
 	  KSZ8031, KSZ8051, KSZ8081, KSZ8895, KSZ886x, and KSZ8721.
 
+config PHY_MICREL_KSZ8031
+    bool "Micrel KSZ8031 support"
+    help
+        Micrel PHY KSZ8031 has problems with autonegotiation
+        after a software reset.
+        Instead of resetting, do a dummy read and wait for
+        the PHY to come up
+
 endif # PHY_MICREL
 
 config PHY_MSCC

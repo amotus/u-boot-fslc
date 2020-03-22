@@ -244,15 +244,36 @@ static int miiphy_restart_aneg(struct eth_device *dev)
 #ifdef CONFIG_MX27
 	fec_mdio_write(eth, fec->phy_id, MII_DCOUNTER, 0x00FF);
 #endif
+
+#ifdef CONFIG_PHY_MICREL_KSZ8031
+	/*
+	 * Micrel PHY KSZ8031 has problems with autonegotiation
+	 * after a software reset.
+	 * Instead of resetting, do a dummy read and wait for
+	 * the PHY to come up
+	 */
+	fec_mdio_read(eth, fec->phy_id, MII_BMCR);
+
+#else
 	fec_mdio_write(eth, fec->phy_id, MII_BMCR, BMCR_RESET);
+#endif
 	udelay(1000);
 
 	/* Set the auto-negotiation advertisement register bits */
 	fec_mdio_write(eth, fec->phy_id, MII_ADVERTISE,
 		       LPA_100FULL | LPA_100HALF | LPA_10FULL |
 		       LPA_10HALF | PHY_ANLPAR_PSB_802_3);
+#ifdef CONFIG_PHY_MICREL_KSZ8031
+	/*
+	 * Micrel PHY KSZ8031 has problems with autonegotiation
+	 * after setting the restart autonegotiation flag.
+	 */
 	fec_mdio_write(eth, fec->phy_id, MII_BMCR,
-		       BMCR_ANENABLE | BMCR_ANRESTART);
+			BMCR_ANENABLE);
+#else
+	fec_mdio_write(eth, fec->phy_id, MII_BMCR,
+			BMCR_ANENABLE | BMCR_ANRESTART);
+#endif
 
 	if (fec->mii_postcall)
 		ret = fec->mii_postcall(fec->phy_id);
@@ -486,11 +507,11 @@ static int fec_open(struct eth_device *edev)
 	/* Enable ENET HW endian SWAP */
 	writel(readl(&fec->eth->ecntrl) | FEC_ECNTRL_DBSWAP,
 	       &fec->eth->ecntrl);
-	/* Enable ENET store and forward mode */
+    /* Enable ENET store and forward mode */
 	writel(readl(&fec->eth->x_wmrk) | FEC_X_WMRK_STRFWD,
 	       &fec->eth->x_wmrk);
 #endif
-	/* Enable FEC-Lite controller */
+    /* Enable FEC-Lite controller */
 	writel(readl(&fec->eth->ecntrl) | FEC_ECNTRL_ETHER_EN,
 	       &fec->eth->ecntrl);
 
@@ -501,7 +522,7 @@ static int fec_open(struct eth_device *edev)
 	/* disable the gasket */
 	writew(0, &fec->eth->miigsk_enr);
 
-	/* wait for the gasket to be disabled */
+    /* wait for the gasket to be disabled */
 	while (readw(&fec->eth->miigsk_enr) & MIIGSK_ENR_READY)
 		udelay(2);
 
@@ -513,7 +534,7 @@ static int fec_open(struct eth_device *edev)
 
 	/* wait until MII gasket is ready */
 	int max_loops = 10;
-	while ((readw(&fec->eth->miigsk_enr) & MIIGSK_ENR_READY) == 0) {
+    while ((readw(&fec->eth->miigsk_enr) & MIIGSK_ENR_READY) == 0) {
 		if (--max_loops <= 0) {
 			printf("WAIT for MII Gasket ready timed out\n");
 			break;
