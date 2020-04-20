@@ -212,6 +212,17 @@ int board_late_init(void)
 	udelay(50);
 	gpio_direction_output(MX28_PAD_LCD_RS__GPIO_1_26, fet_active);
 
+    /*
+     * Customer Watchdog Timer
+     * WDT Early Feed Once
+     * GPIO 2_25
+    */
+	gpio_direction_output(MX28_PAD_SSP3_MOSI__GPIO_2_25, 1);
+	udelay(1000);
+	gpio_direction_output(MX28_PAD_SSP3_MOSI__GPIO_2_25, 0);
+	udelay(1000);
+	gpio_set_value(MX28_PAD_SSP3_MOSI__GPIO_2_25, 1);
+
 	return 0;
 }
 

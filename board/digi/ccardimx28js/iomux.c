@@ -61,6 +61,9 @@ const iomux_cfg_t iomux_setup[] = {
     MX28_PAD_I2C0_SCL__DUART_RX,
     MX28_PAD_I2C0_SDA__DUART_TX,
 
+    /* Customer Configuration WDT extern */
+    MX28_PAD_SSP3_MOSI__GPIO_2_25 | MUX_CONFIG_SSP0,
+
     /* MMC0 */
     MX28_PAD_SSP0_DATA0__SSP0_D0 | MUX_CONFIG_SSP0,
     MX28_PAD_SSP0_DATA1__SSP0_D1 | MUX_CONFIG_SSP0,
