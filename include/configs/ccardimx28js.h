@@ -115,9 +115,9 @@
 /* Extra Environment */
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"ubifs_file=filesystem.ubifs\0" \
-    "amotus_sys=a\0" \
-    "amotus_seamless_counter=0\0" \
-    "amotus_update_mode=yes\0" \
+	"amotus_sys=a\0" \
+	"amotus_seamless_counter=0\0" \
+	"amotus_update_mode=yes\0" \
 	"update_nand_full_filename=u-boot-mxsboot.nand\0" \
 	"update_nand_firmware_filename=u-boot.sb\0"	\
 	"update_nand_firmware_maxsz=0x100000\0"	\
@@ -130,46 +130,49 @@
 		"setexpr update_nand_fcb ${fcb_sz} * ${nand_writesize}\0" \
 	"update_nand_firmware_full=" /* Update FCB, DBBT and FW */ \
 		"run lookup_mode; " \
-        "if ${get_cmd} ${update_nand_full_filename} ; then " \
-		"run update_nand_get_fcb_size ; " \
-		"nand scrub -y 0x0 ${filesize} ; " \
-		"nand write.raw ${loadaddr} 0x0 ${fcb_sz} ; " \
-		"setexpr update_off ${loadaddr} + ${update_nand_fcb} ; " \
-		"setexpr update_sz ${filesize} - ${update_nand_fcb} ; " \
-		"nand write ${update_off} ${update_nand_fcb} ${update_sz} ; " \
+		"if ${get_cmd} ${update_nand_full_filename} ; then " \
+			"run update_nand_get_fcb_size ; " \
+			"nand scrub -y 0x0 ${filesize} ; " \
+			"nand write.raw ${loadaddr} 0x0 ${fcb_sz} ; " \
+			"setexpr update_off ${loadaddr} + ${update_nand_fcb} ; " \
+			"setexpr update_sz ${filesize} - ${update_nand_fcb} ; " \
+			"nand write ${update_off} ${update_nand_fcb} ${update_sz} ; " \
 		"fi\0" \
 	"update_nand_firmware="		/* Update only firmware */ \
 		"run lookup_mode; " \
 		"if ${get_cmd} ${update_nand_firmware_filename} ; then " \
-		"run update_nand_get_fcb_size ; " \
-		"setexpr fcb_sz ${update_nand_fcb} * 2 ; " /* FCB + DBBT */ \
-		"setexpr fw_sz ${update_nand_firmware_maxsz} * 2 ; " \
-		"setexpr fw_off ${fcb_sz} + ${update_nand_firmware_maxsz};" \
-		"nand erase ${fcb_sz} ${fw_sz} ; " \
-		"nand write ${loadaddr} ${fcb_sz} ${filesize} ; " \
-		"nand write ${loadaddr} ${fw_off} ${filesize} ; " \
+			"run update_nand_get_fcb_size ; " \
+			"setexpr fcb_sz ${update_nand_fcb} * 2 ; " /* FCB + DBBT */ \
+			"setexpr fw_sz ${update_nand_firmware_maxsz} * 2 ; " \
+			"setexpr fw_off ${fcb_sz} + ${update_nand_firmware_maxsz};" \
+			"nand erase ${fcb_sz} ${fw_sz} ; " \
+			"nand write ${loadaddr} ${fcb_sz} ${filesize} ; " \
+			"nand write ${loadaddr} ${fw_off} ${filesize} ; " \
 		"fi\0" \
 	"update_nand_kernel="		/* Update kernel_${amotus_sys} */ \
 		"run lookup_mode; " \
 		"mtdparts default; " \
-		"nand erase.part kernel_${amotus_sys}; " \
-		"${get_cmd} ${image}; " \
-		"nand write ${loadaddr} kernel_${amotus_sys} ${filesize}\0" \
+		"if ${get_cmd} ${image}; then " \
+			"nand erase.part kernel_${amotus_sys}; " \
+			"nand write ${loadaddr} kernel_${amotus_sys} ${filesize} ; " \
+		"fi\0" \
 	"update_nand_fdt="		/* Update fdt_${amotus_sys} */ \
 		"run lookup_mode; " \
 		"mtdparts default; " \
-		"nand erase.part fdt_${amotus_sys}; " \
-		"${get_cmd} ${fdt_file}; " \
-		"nand write ${loadaddr} fdt_${amotus_sys} ${filesize}\0" \
+		"if ${get_cmd} ${fdt_file}; then " \
+			"nand erase.part fdt_${amotus_sys}; " \
+			"nand write ${loadaddr} fdt_${amotus_sys} ${filesize} ; " \
+		"fi\0" \
 	"update_nand_rootfs="		/* Update rootfs_${amotus_sys} */ \
 		"run lookup_mode; " \
 		"mtdparts default; " \
-		"nand erase.part rootfs_${amotus_sys}; " \
-		"${get_cmd} ${ubifs_file}; " \
-		"ubi part rootfs_${amotus_sys}; " \
-		"ubi create rootfs_${amotus_sys}; " \
-		"ubi write ${loadaddr} rootfs_${amotus_sys} ${filesize}\0" \
-	"nandargs=setenv bootargs console=${console_mainline},${baudrate} rootfstype=ubifs root=ubi0:rootfs_a rw ubi.mtd=rootfs_a ${mtdparts} rootwait=1 loglevel=8\0" \
+		"if ${get_cmd} ${ubifs_file}; then " \
+			"nand erase.part rootfs_${amotus_sys}; " \
+			"ubi part rootfs_${amotus_sys}; " \
+			"ubi create rootfs_${amotus_sys}; " \
+			"ubi write ${loadaddr} rootfs_${amotus_sys} ${filesize} ; " \
+		"fi\0" \
+	"nandargs=setenv bootargs console=${console_mainline},${baudrate} rootfstype=ubifs root=ubi0:rootfs_${amotus_sys} rw ubi.mtd=rootfs_${amotus_sys} ${mtdparts} rootwait=1 loglevel=8\0" \
 	"nandboot="		/* Boot from NAND */ \
 		"mtdparts default; " \
 		"run nandargs; " \
@@ -184,7 +187,7 @@
 				"echo \"ERROR: Set boot_fdt to yes or no.\"; " \
 			"fi; " \
 		"fi\0" \
-    "serverip=192.168.100.135\0"  /* Update tftp serverip */ \
+	"serverip=192.168.10.1\0"  /* Update tftp serverip */ \
 	"update_sd_firmware_filename=u-boot.sd\0" \
 	"update_sd_firmware="		/* Update the SD firmware partition */ \
 		"if mmc rescan ; then "	\
@@ -194,7 +197,7 @@
 		"mmc write ${loadaddr} 0x800 ${fw_sz} ; " \
 		"fi ; "	\
 		"fi\0" \
-    "script=boot.scr\0"	\
+	"script=boot.scr\0"	\
 	"image=zImage\0" \
 	"console_fsl=ttyAM0\0" \
 	"console_mainline=ttyAMA0\0" \
@@ -228,43 +231,51 @@
 		"else " \
 			"bootz; " \
 		"fi;\0" \
-    "lookup_mode=" \
-        "if test ${ip_dyn} = yes; then " \
+	"lookup_mode=" \
+		"if test ${ip_dyn} = yes; then " \
 			"setenv get_cmd dhcp; " \
 		"else " \
 			"setenv get_cmd tftp; " \
 		"fi; \0" \
-    "amotus_auto_update=if test ${amotus_update_mode} = yes; then " \
-            "echo Production flash start...; " \
-            "env default -f -a; " \
-			"run update_nand_firmware_full; " \
-			"setenv amotus_sys b; " \
-			"run update_nand_kernel; " \
-			"run update_nand_fdt; " \
-			"run update_nand_rootfs; " \
+	"amotus_auto_update=if test ${amotus_update_mode} = yes; then " \
+			"echo Production flash start... ; " \
+			"env default -f -a ; " \
+			"run update_nand_firmware_full ; " \
+			"setenv amotus_sys b ; " \
+			"run update_nand_kernel ; " \
+			"run update_nand_fdt ; " \
+			"run update_nand_rootfs ; " \
+			"setenv amotus_bootstatus_b updated ; " \
 			"setenv amotus_sys a; " \
-			"run update_nand_kernel; " \
-			"run update_nand_fdt; " \
-			"run update_nand_rootfs; " \
-			"setenv amotus_sys a; " \
-			"setenv amotus_seamless_counter 0; " \
-            "setenv amotus_update_mode no; " \
-            "saveenv; " \
-            "echo Production flash success; " \
+			"run update_nand_kernel ; " \
+			"run update_nand_fdt ; " \
+			"run update_nand_rootfs ; " \
+			"setenv amotus_sys a ; " \
+			"setenv amotus_bootstatus_a updated ; " \
+			"setenv amotus_seamless_counter 0 ; " \
+			"setenv amotus_update_mode no ; " \
+			"saveenv ; " \
+			"echo Production flash success ; " \
 		"else " \
 			"echo Mode: Normal; " \
 		"fi;\0" \
-    "amotus_auto_switch=if ${amotus_sys} = a; then " \
-        "setenv amotus_seamless_counter 0; " \
-        "setenv amotus_sys b; else setenv amotus_sys a; " \
-        "saveenv; " \
-    "fi;\0" \
-    "amotus_seamless_check=" \
-        "setexpr amotus_seamless_counter ${amotus_seamless_counter} + 1; " \
-        "saveenv; " \
-        "if ${amotus_seamless_counter} -ge 3; then " \
-            "run amotus_auto_switch; " \
-        "fi;\0" \
+	"amotus_auto_switch=if test ${amotus_sys} = a; then " \
+			"setenv amotus_seamless_counter 0; " \
+			"setenv amotus_sys b; " \
+			"saveenv; " \
+		"else " \
+			"setenv amotus_seamless_counter 0; " \
+			"setenv amotus_sys a; " \
+			"saveenv; " \
+		"fi;\0" \
+	"amotus_seamless_max_retry=3\0" \
+	"amotus_seamless_check=" \
+		"setexpr amotus_seamless_counter ${amotus_seamless_counter} + 1; " \
+		"saveenv; " \
+		"if test ${amotus_seamless_counter} -ge ${amotus_seamless_max_retry}; then " \
+			"setenv amotus_bootstatus_${amotus_sys} failed; " \
+			"run amotus_auto_switch; " \
+		"fi;\0" \
 	"netargs=setenv bootargs console=${console_mainline},${baudrate} " \
 		"root=/dev/nfs " \
 		"ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp rootwait\0" \
@@ -291,9 +302,10 @@
 		"fi;\0"
 
 #define CONFIG_BOOTCOMMAND \
-    "run lookup_mode; " \
-    "run amotus_auto_update; " \
-    "run nandboot"
+	"run lookup_mode; " \
+	"run amotus_auto_update; " \
+	"run amotus_seamless_check; " \
+	"run nandboot"
 
 /* The rest of the configuration is shared */
 #include <configs/mxs.h>
