@@ -33,6 +33,13 @@ config IMX_WATCHDOG
 	   Select this to enable the IMX and LSCH2 of Layerscape watchdog
 	   driver.
 
+config MXS_WATCHDOG
+    bool "Enable Watchdog Timer support MXS28"
+    select HW_WATCHDOG
+    help
+        Select this to enable the MXS RTC Watchdog of Layerscape watchdog
+        driver.
+
 config OMAP_WATCHDOG
 	bool "TI OMAP watchdog driver"
 	depends on ARCH_OMAP2PLUS
