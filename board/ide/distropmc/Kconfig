@@ -1,0 +1,12 @@
+if TARGET_IDE_DISTROPMC
+
+config SYS_BOARD
+	default "distropmc"
+
+config SYS_VENDOR
+	default "ide"
+
+config SYS_CONFIG_NAME
+	default "ide_distropmc"
+
+endif

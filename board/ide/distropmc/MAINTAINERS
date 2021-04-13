@@ -1,0 +1,7 @@
+IDE_DISTROPMC BOARD
+M:	Marc Ferland <ferlandm@amotus.ca>
+S:	Maintained
+F:	arch/arm/dts/imx6ull-dart-6ul-ide.dts
+F:	board/ide/distropmc/
+F:	configs/ide_distropmc_emmc_defconfig
+F:	include/configs/ide_distropmc.h

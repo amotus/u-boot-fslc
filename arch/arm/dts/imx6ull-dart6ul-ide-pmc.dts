@@ -1,0 +1,31 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ * Copyright (C) 2021 Marc Ferland, Amotus Solutions Inc., <ferlandm@amotus.ca>
+ */
+
+/dts-v1/;
+
+#include "imx6ull.dtsi"
+#include "imx6ull-dart-6ul.dtsi"
+
+/ {
+	model = "IDE Systems Distribution Box";
+	compatible = "ide,imx6ull-dart6ul-ide-pmc", "fsl,imx6ull";
+
+	aliases {
+		eeprom1 = &boardid;
+	};
+
+};
+
+&usdhc2 {
+	status = "okay";
+};
+
+&i2c2 {
+	boardid: eeprom@52 {
+		compatible = "rohm,br24g04", "atmel,24c04";
+		pagesize = <16>;
+		reg = <0x52>;
+	};
+};
