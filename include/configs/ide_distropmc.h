@@ -9,12 +9,39 @@
 
 #include <linux/sizes.h>
 #include <linux/stringify.h>
-#include "mx6_common.h"
+#include <asm/arch/imx-regs.h>
+#include <asm/mach-imx/gpio.h>
+
 
 /* SPL options */
 #include "imx6_spl.h"
 
+#define CONFIG_SC_TIMER_CLK 8000000 /* 8Mhz */
+#define COUNTER_FREQUENCY CONFIG_SC_TIMER_CLK
+#define CONFIG_BOARD_POSTCLK_INIT
+#define CONFIG_MXC_GPT_HCLK
+/* Manufacturing needs a rather big initramfs, make sure we have
+ * enough memory available. */
+#define CONFIG_SYS_BOOTM_LEN            SZ_128M
+#define CONFIG_SYS_FSL_CLK
+#define CONFIG_CMDLINE_TAG
+#define CONFIG_SETUP_MEMORY_TAGS
+#define CONFIG_INITRD_TAG
+#define CONFIG_REVISION_TAG
+#define CONFIG_LOADADDR		0x82000000
+#define CONFIG_SYS_LOAD_ADDR	CONFIG_LOADADDR
+/* Miscellaneous configurable options */
+#define CONFIG_SYS_CBSIZE	512
+#define CONFIG_SYS_MAXARGS	32
+#ifndef CONFIG_MX6
+#define CONFIG_MX6
+#endif
+
 #define CONFIG_SYS_FSL_USDHC_NUM        2
+
+#ifdef CONFIG_SPL_BUILD
+#define CONFIG_SPL_DRIVERS_MISC_SUPPORT
+#endif
 
 #ifdef CONFIG_CMD_NET
 #define CONFIG_FEC_ENET_DEV		0
@@ -84,7 +111,10 @@
 	"mmcargs=setenv bootargs " \
 		"root=/dev/mmcblk${mmcdev}p${mmcpart} ${optargs} " \
 		"console=${console} rootfstype=${mmcrootfstype}\0" \
-	"mmc_mmc_fit=run mmcloadfit;run mmcargs addcon; bootm ${fit_addr}\0" \
+	"mmc_mmc_fit=run mmcloadfit;run mmcargs addcon; bootm ${fit_addr}#conf-${fdt_file}\0" \
+
+#define ENV_MFG \
+	"mfg_fit=bootm ${fit_addr}#conf-${fdt_file}\0" \
 
 /* Default environment */
 #define CONFIG_EXTRA_ENV_SETTINGS \
@@ -92,8 +122,7 @@
 	"console=ttymxc0,115200n8\0" \
 	"addcon=setenv bootargs ${bootargs} console=${console},${baudrate}\0" \
 	"fit_addr=0x82000000\0" \
-	ENV_MMC
-
-#define CONFIG_BOOTCOMMAND		"run mmc_mmc_fit"
+	ENV_MMC \
+	ENV_MFG
 
 #endif	/* __IDE_DISTROPMC */
