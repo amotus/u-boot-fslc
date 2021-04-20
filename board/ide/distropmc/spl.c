@@ -12,6 +12,7 @@
 #include <asm/arch/mx6-ddr.h>
 #include <asm/arch/mx6-pins.h>
 #include <asm/arch/crm_regs.h>
+#include <asm/arch/sys_proto.h>
 #include <fsl_esdhc_imx.h>
 
 #define UART_PAD_CTRL  (PAD_CTL_PKE | PAD_CTL_PUE |		\
@@ -179,6 +180,15 @@ int board_mmc_init(struct bd_info *bis)
 	}
 
 	return 0;
+}
+
+void board_boot_order(u32 *spl_boot_list)
+{
+	u32 boot_dev = spl_boot_device();
+	if (boot_dev == BOOT_DEVICE_MMC1)
+		/* boot from MMC2 (eMMC) and skip uSD */
+		boot_dev = BOOT_DEVICE_MMC2;
+	spl_boot_list[0] = boot_dev;
 }
 
 void board_init_f(ulong dummy)
