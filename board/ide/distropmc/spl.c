@@ -122,7 +122,6 @@ static iomux_v3_cfg_t const usdhc1_pads[] = {
 	MX6_PAD_SD1_DATA3__USDHC1_DATA3 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 };
 
-#ifndef CONFIG_NAND_MXS
 static iomux_v3_cfg_t const usdhc2_pads[] = {
 	MX6_PAD_NAND_RE_B__USDHC2_CLK | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 	MX6_PAD_NAND_WE_B__USDHC2_CMD | MUX_PAD_CTRL(USDHC_PAD_CTRL),
@@ -135,19 +134,16 @@ static iomux_v3_cfg_t const usdhc2_pads[] = {
 	MX6_PAD_NAND_DATA06__USDHC2_DATA6 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 	MX6_PAD_NAND_DATA07__USDHC2_DATA7 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 };
-#endif
 
 static struct fsl_esdhc_cfg usdhc_cfg[] = {
 	{
 		.esdhc_base = USDHC1_BASE_ADDR,
 		.max_bus_width = 4,
 	},
-#ifndef CONFIG_NAND_MXS
 	{
 		.esdhc_base = USDHC2_BASE_ADDR,
 		.max_bus_width = 8,
 	},
-#endif
 };
 
 int board_mmc_getcd(struct mmc *mmc)
@@ -165,12 +161,10 @@ int board_mmc_init(struct bd_info *bis)
 			SETUP_IOMUX_PADS(usdhc1_pads);
 			usdhc_cfg[i].sdhc_clk = mxc_get_clock(MXC_ESDHC_CLK);
 			break;
-#ifndef CONFIG_NAND_MXS
 		case 1:
 			SETUP_IOMUX_PADS(usdhc2_pads);
 			usdhc_cfg[i].sdhc_clk = mxc_get_clock(MXC_ESDHC2_CLK);
 			break;
-#endif
 		default:
 			printf("Warning - USDHC%d controller not supporting\n",
 			       i + 1);
