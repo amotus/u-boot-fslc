@@ -102,7 +102,7 @@
 	"fitpart=1\0" \
 	"bootdelay=3\0" \
 	"silent=1\0" \
-	"optargs=rw rootwait\0" \
+	"optargs=rw rootwait console=${console}\0" \
 	"mmcautodetect=yes\0" \
 	"mmcrootfstype=ext4\0" \
 	"mmcfit_name=fitImage\0" \
@@ -111,7 +111,7 @@
 	"mmcargs=setenv bootargs " \
 		"root=/dev/mmcblk${mmcdev}p${mmcpart} ${optargs} " \
 		"rootfstype=${mmcrootfstype}\0" \
-	"mmc_mmc_fit=run mmcloadfit;run mmcargs addcon; bootm ${fit_addr}#conf-${fdt_file}\0" \
+	"mmc_mmc_fit=run mmcloadfit; run mmcargs; bootm ${fit_addr}#conf-${fdt_file}\0" \
 
 #define ENV_MFG \
 	"mfg_fit=bootm ${fit_addr}#conf-${fdt_file}\0" \
@@ -120,7 +120,6 @@
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"fdt_high=0xffffffff\0" \
 	"console=ttymxc0,115200n8\0" \
-	"addcon=setenv bootargs ${bootargs} console=${console}\0" \
 	"fit_addr=0x82000000\0" \
 	ENV_MMC \
 	ENV_MFG
