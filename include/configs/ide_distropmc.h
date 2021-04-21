@@ -102,7 +102,7 @@
 	"fitpart=1\0" \
 	"bootdelay=3\0" \
 	"silent=1\0" \
-	"optargs=rw rootwait console=${console}\0" \
+	"optargs=rw rootwait\0" \
 	"mmcautodetect=yes\0" \
 	"mmcrootfstype=ext4\0" \
 	"mmcfit_name=fitImage\0" \
@@ -110,7 +110,7 @@
 		    "${mmcfit_name}\0" \
 	"mmcargs=setenv bootargs " \
 		"root=/dev/mmcblk${mmcdev}p${mmcpart} ${optargs} " \
-		"rootfstype=${mmcrootfstype}\0" \
+		"rootfstype=${mmcrootfstype} console=${console}\0" \
 	"mmc_mmc_fit=run mmcloadfit; run mmcargs; bootm ${fit_addr}#conf-${fdt_file}\0" \
 
 #define ENV_MFG \
