@@ -54,17 +54,11 @@
 #define FEC_QUIRK_ENET_MAC
 #endif
 
-/* UUU environment variables */
-#define CONFIG_MFG_ENV_SETTINGS \
-	CONFIG_MFG_ENV_SETTINGS_DEFAULT \
-	"initrd_addr=0x43800000\0" \
-	"initrd_high=0xffffffffffffffff\0" \
-	"emmc_dev=0\0"\
-	"sd_dev=1\0" \
-
 /* Initial environment variables */
 #define CONFIG_EXTRA_ENV_SETTINGS		\
-	CONFIG_MFG_ENV_SETTINGS \
+	"bootcmd_mfg=ums 0 mmc 0\0" \
+	"emmc_dev=0\0" \
+	"sd_dev=1\0" \
 	"bootdir=/boot\0"	\
 	"script=boot.scr\0" \
 	"image=Image.gz\0" \
