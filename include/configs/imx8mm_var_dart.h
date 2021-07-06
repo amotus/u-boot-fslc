@@ -78,9 +78,9 @@
 	"mmcblk=1\0" \
 	"mmcautodetect=yes\0" \
 	"mmcpart=1\0" \
-	"m4_addr=0x7e0000\0" \
-	"m4_bin=hello_world.bin\0" \
-	"use_m4=no\0" \
+	"m4_addr=0x7e000000\0" \
+	"m4_bin=DiaMentisM4.bin\0" \
+	"use_m4=yes\0" \
 	"loadm4bin=load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${bootdir}/${m4_bin}; " \
 		"cp.b ${loadaddr} ${m4_addr} ${filesize}\0" \
 	"runm4bin=" \
